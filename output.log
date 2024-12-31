@@ -1,0 +1,5 @@
+Using image name: 946508131842.dkr.ecr.eu-central-1.amazonaws.com/app-importer:dm-108-test-market
+Current task definition: arn:aws:ecs:eu-central-1:381491847947:task-definition/sb1-app-importer:59
+New task definition: arn:aws:ecs:eu-central-1:381491847947:task-definition/sb1-app-importer:60
+Waiting for service deployment to complete...
+Service deployment successful.
