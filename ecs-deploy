@@ -479,39 +479,41 @@ function updateService() {
 function waitForGreenDeployment {
   DEPLOYMENT_SUCCESS="false"
   every=2
-  i=0
+  start_time=$(date +%s)
+  timeout_seconds=$TIMEOUT
   echo "Waiting for service deployment to complete..."
-  while [ $i -lt $TIMEOUT ]
-  do
+  while true; do
+    current_time=$(date +%s)
+    elapsed_time=$((current_time - start_time))
+    
+    if [ $elapsed_time -ge $timeout_seconds ]; then
+        echo "Timeout reached after $elapsed_time seconds"
+        break
+    fi
+    
     DEPLOYMENTS=$($AWS_ECS describe-services --services $SERVICE --cluster $CLUSTER)
     NEW_DEPLOYMENT=$(echo $DEPLOYMENTS | jq ".services[].deployments[] | select(.taskDefinition == \"$NEW_TASKDEF\")")
     DEPLOYMENTS_COUNT=$(echo $DEPLOYMENTS | jq ".services[].deployments | length")
     
-    # if this is empty, it means the new (expected) deploy hasnt picked up yet
     if [ -z "$NEW_DEPLOYMENT" ]; then
-      sleep $every
-      i=$(( $i + $every ))
-      continue
+        sleep $every
+        continue
     fi
     
     COUNT_DESIRED=$(echo $NEW_DEPLOYMENT | jq -r '.desiredCount')
     COUNT_LAUNCHED=$(echo $NEW_DEPLOYMENT | jq -r '.runningCount')
 
-    # Compare counts of launched new containers vs. requested
-    # and continue when all new services are launched.
-    # If the wait time has passed, we need to roll back
     if [ "$COUNT_DESIRED" == "$COUNT_LAUNCHED" ] && [ $DEPLOYMENTS_COUNT -eq 1 ]; then
-      echo "Service deployment successful."
-      DEPLOYMENT_SUCCESS="true"
-      # Exit the loop.
-      i=$TIMEOUT
-    else
-      sleep $every
-      i=$(( $i + $every ))
+        echo "Service deployment successful."
+        DEPLOYMENT_SUCCESS="true"
+        break
     fi
+    
+    sleep $every
   done
 
   if [[ "${DEPLOYMENT_SUCCESS}" != "true" ]]; then
+    echo "ERROR: New deployment took longer than $TIMEOUT seconds"
     if [[ "${ENABLE_ROLLBACK}" != "false" ]]; then
       rollback
     fi
