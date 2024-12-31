@@ -4,12 +4,6 @@
 
 This script uses the Task Definition and Service entities in Amazon's ECS to instigate an automatic blue/green deployment.
 
-## NOTE: Maintenance Only
-
-`ecs-deploy` is now in maintenance mode. In other words, we are considering it
-"feature complete" and will generally only consider PRs if they are bugfixes or
-are to add support for new AWS CLI features.
-
 ## Usage
 
     One of the following is required:
