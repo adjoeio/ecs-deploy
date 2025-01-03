@@ -1,3 +1,0 @@
-Current task definition: arn:aws:ecs:eu-central-1:381491847947:task-definition/sb1-app-importer:74
-Force a new deployment of the service
-Waiting for service deployment to complete...
