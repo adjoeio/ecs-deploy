@@ -736,8 +736,13 @@ if [ "$BASH_SOURCE" == "$0" ]; then
         assumeRole
     fi
 
+    # Get current task definition
+    getCurrentTaskDefinition
+    echo "Current task definition: $TASK_DEFINITION_ARN";
+
     # Not required creation of new a task definition
     if [ $FORCE_NEW_DEPLOYMENT == true ]; then
+        NEW_TASKDEF=$TASK_DEFINITION_ARN
         updateServiceForceNewDeployment
         if [[ $SKIP_DEPLOYMENTS_CHECK != true ]]; then
           waitForGreenDeployment
@@ -748,10 +753,6 @@ if [ "$BASH_SOURCE" == "$0" ]; then
     # Determine image name
     parseImageName
     echo "Using image name: $useImage"
-
-    # Get current task definition
-    getCurrentTaskDefinition
-    echo "Current task definition: $TASK_DEFINITION_ARN";
 
     # create new task definition json
     createNewTaskDefJson
